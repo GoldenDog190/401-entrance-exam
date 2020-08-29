@@ -6,6 +6,9 @@
   <title>Document</title>
 </head>
 <body>
-  
+  <% books.forEach(pokemon => { %>
+    <%- include('pokemon/favorites', {newPokemonArr : newPokemonArr}) %>
+    <%- include('pokemon/pokemon', {newPokemonArr : newPokemonArr}) %>
+   <% }) %>
 </body>
 </html>

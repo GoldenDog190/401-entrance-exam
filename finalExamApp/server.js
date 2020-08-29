@@ -18,13 +18,46 @@ const client = new pg.Client(DATABASE_URL);
 client.on('error', (error) => console.error(error));
 
 //routes
-app.get('/', getPokemonData);
+app.post('/pokemon', getPokemonData);
+app.get('/pokemon/:id', newPokemon);
+app.get('/books/id', showPokemon);
 
 //route handlers
 app.get('/', (request, response) => {
+  client.query('SELECT * FROM pokemons')
+  .then(result => {
+    console.log(result.rows);
+      response.render('pages/index', {newPokemonArr : newPokemonArr});
+    })
+    response.render('pages/index');
+  });
 
-   response.render('index');
-})
+  app.get('/pokemon/pokemon', (request, response) => {
+    response.render('pages/pokemon/pokemon');
+  
+  });
+
+function showPokemon(request, response) {
+  client.query('SELECT * FROM pokemons WHERE id=$1', [request.params.id])
+  .then( result => {
+     response.render('/', {pokemon:result.rows[0]});
+  })
+}
+
+function newPokemon(request, response){
+  console.log(request.body);
+  const {name, url} = request.body;
+
+  const SQL = `INSERT INTO pokemons (name, url) VALUES ($1, $2) RETURNING id`;
+  const pokeArray = [name, url];
+
+  client.query(SQL, pokeArray)
+  .then((result) => {
+
+    response.redirect('/', result);
+
+  })
+}
 
 function getPokemonData(request, response) {
  let searchPokemon = request.body.name;
@@ -45,8 +78,8 @@ function getPokemonData(request, response) {
     // response.status(500).render('pages/error');
     console.log(error);
     response.status(500).send(error);
-   })
-}
+   });
+};
 
 //constructor
 function Pokemon (request, response) {
@@ -58,5 +91,4 @@ function Pokemon (request, response) {
 client.connect()
 .then( () => {
   app.listen(PORT, () => console.log(`running the server on PORT : ${PORT} working`));
-
-})
+  });
