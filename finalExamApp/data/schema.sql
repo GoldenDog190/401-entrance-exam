@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS pokemons;
+
+CREATE TABLE pokemons (
+  id SERIAL PRIMARY KEY
+)
